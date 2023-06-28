@@ -1,0 +1,17 @@
+@font-face {
+  font-family: myriad-pro-light;
+  src: url(myriad-pro/MYRIADPRO-LIGHT.otf);
+}
+
+.data-area {
+  margin-top: 1em;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  width: 100%;
+  position: fixed;
+  overflow-y: auto;
+  background-color: #202123;
+  color: white;
+}

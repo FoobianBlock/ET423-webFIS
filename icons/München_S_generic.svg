@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1059.674"
+   height="464.977"
+   viewBox="0 0 1059.674 464.977"
+   overflow="visible"
+   enable-background="new 0 0 1059.674 464.977"
+   xml:space="preserve"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="München_S_generic.svg"
+   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs11" /><sodipodi:namedview
+   id="namedview9"
+   pagecolor="#505050"
+   bordercolor="#eeeeee"
+   borderopacity="1"
+   inkscape:showpageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#505050"
+   showgrid="false"
+   inkscape:zoom="0.80608284"
+   inkscape:cx="491.88493"
+   inkscape:cy="259.27856"
+   inkscape:window-width="1920"
+   inkscape:window-height="1017"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Muenchen_S7" />
+
+<g
+   id="Muenchen_S7">
+
+    <path
+   id="Ei"
+   fill="#963833"
+   d="M787.5,0H272.173C143.773,0,0,104.088,0,232.488c0,128.4,143.773,232.488,272.173,232.488H787.5      c128.4,0,272.174-104.088,272.174-232.488C1059.674,104.088,915.901,0,787.5,0z"
+   style="fill:#008e4e;fill-opacity:1" />
+
+  <g
+   id="Univers_75_Black_504pt_1_">
+    <path
+   id="S"
+   fill="#ffffff"
+   d="m 470.86748,299.015 c 0.504,14.616 1.512,56.448 61.487,56.448 8.568,0 53.928,0 53.928,-41.328 0,-17.136 -7.056,-28.728 -31.248,-35.28 l -89.208,-23.184 c -25.2,-6.552 -90.216,-23.688 -90.216,-99.791 0,-58.968 44.352,-113.904 153.215,-113.904 142.127,0 148.175,77.112 148.679,115.919 h -102.309 c 0,-11.088 0.504,-50.399 -47.879,-50.399 -29.232,0 -47.88,16.632 -47.88,38.304 0,26.712 22.176,33.264 36.792,37.296 l 68.04,17.64 c 48.384,12.6 105.84,27.72 105.84,104.832 0,81.144 -69.553,117.432 -160.776,117.432 -37.8,0 -98.783,-6.049 -132.047,-43.344 -26.712,-29.232 -27.216,-65.016 -27.72,-80.641 z" />
+    
+  </g>
+
+</g>
+</svg>
