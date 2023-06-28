@@ -1,0 +1,20 @@
+{
+    "München Ost": {
+        "nameDE": "Ostbahnhof",
+        "nameEN": "Munich East"
+    },
+    "Flughafen/Airport ✈": {
+        "nameDE": "Flughafen München",
+        "nameEN": "Airport"
+    },
+    "München Karlsplatz": {
+        "nameDE": "Karlsplatz (Stachus)"
+    },
+    "München Hbf (tief)": {
+        "nameDE": "Hauptbahnhof",
+        "nameEN": "Central Station"
+    },
+    "München-Pasing": {
+        "nameDE": "Pasing"
+    }
+}

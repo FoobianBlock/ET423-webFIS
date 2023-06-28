@@ -16,12 +16,12 @@
                             </div>
                             <div style="height: 100%; font-family: 'myriad-pro-condensed', sans-serif;">
                                 <div style="width: 100%; font-size: 24px; font-family: 'myriad-pro', sans-serif; padding-top: 8px; padding-left: 2px;">
-                                    <span>Nächster Halt</span>
-                                    <i style="color: #666666;">Next stop</i>
+                                    <span id="stationActionDE">Nächster Halt</span>
+                                    <i id="stationActionEN" style="color: #666666;">Next stop</i>
                                 </div>
                                 <div style="height: 74%; width: 100%; font-size: 75px;display: inline-flex;">
-                                    <span style="padding-right: 15px;">Ostbahnhof</span>
-                                    <i style="color: #666666;padding-right: 15px;">Munich East</i>
+                                    <span id="nextStopDE" style="padding-right: 15px;">Ostbahnhof</span>
+                                    <i id="nextStopEN" style="color: #666666;padding-right: 15px;">Munich East</i>
                                     <svg style="height: 60px;align-self: center;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(102, 102, 102);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(102, 102, 102);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(102, 102, 102);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
                                 </div>
                             </div>
@@ -31,35 +31,32 @@
                         </div>
                     </div>
                     <div style="width: 39.26%; background-color: black; height: 100%;">
-                        <video autoplay muted loop width="100%">
-                            <source src="https://assets.static-bahn.de/dam/jcr:5e33cbde-1254-4241-a8d4-2f6dcb605d47/220202_1080p_Erklaervideo_Simpleshow_Folienballons.mp4">
-                            <source src="https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4">
-                            <source src="https://assets.static-bahn.de/dam/jcr:da1188f1-8293-4351-8ac7-f26d1dbb4b5c/220202_1080p_Erklaervideo_Simpleshow_PersonenImGleis.mp4">
-                            <source src="https://assets.static-bahn.de/dam/jcr:a0c7be5c-39a1-4cac-8593-26ef12b8dea9/220202_1080p_Erklaervideo_Simpleshow_Tuerstoerung.mp4">
-                            <source src="https://assets.static-bahn.de/dam/jcr:49af3eb3-ff25-4de5-97a8-3f8ce9aa4f3a/220202_1080p_Erklaervideo_Simpleshow_Bahn%C3%BCberg%C3%A4nge_Clip01.mp4">
-                            <source src="https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4">
-                        </video>
+                        <video id="infotainmentPlayer" autoplay muted width="100%" onended="advanceInfotainmentQueue()"></video>
                     </div>
                 </div>
                 <div style="height: 21.5%; vertical-align: bottom; background-image: linear-gradient(to right, #004679, #0F86D8); display: flex; flex-direction: column;">
                     <div style="height: 89.6%;  display: flex;align-items: center;">
-                        <img src="icons/München_S_generic.svg" style="display: table-cell; width: 147px; padding: 25px;padding-left: 30px;">
-                        <span style="font-family: 'myriad-pro-light', sans-serif; color: #ffffff;  font-size: 77px;font-style: normal;font-weight: 700;letter-spacing: 1.2px;">Kreuzstraße</span>
+                        <img id="currentLineNumber" src="icons/München_S_generic.svg" style="display: table-cell; width: 147px; padding: 25px;padding-left: 30px;">
+                        
+                        <span id="finalDestinationDE" style="font-family: 'myriad-pro-light', sans-serif; color: #ffffff;  font-size: 77px;font-style: normal;font-weight: 700;letter-spacing: 1.2px;"></span>
                         <svg style="height: 60px; padding: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(255, 255, 255);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(255, 255, 255);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(255, 255, 255);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
                         <span id="digitalClock" style="font-family: 'myriad-pro', sans-serif; color: #ffffff;  display: table-cell;font-size: 40px;font-style: normal;font-weight: 700; padding-right: 30px; text-align: right;margin-left: auto;">00:00</span>
                     </div>
-                    <div style="height: 10.4%; align-self: flex-end; width: 100%; background-color: #008E4E;"></div>
+                    <div class="lineColoured" style="height: 10.4%; align-self: flex-end; width: 100%; background-color: #008E4E;"></div>
                 </div>
             </div>
 
             <script src="script.js"></script>
 
-            <img src="https://www.s-bahn-muenchen-magazin.de/06_Juni%202019/Modernisierung%20Anschluss%C3%BCbersicht/image-thumb__325__articleTextImage/S-Bahn-Muenchen_Header-3_v2.jpg.png" style="opacity: 40%; position: absolute; width: 1900px;">
+            <!-- <img src="https://www.s-bahn-muenchen-magazin.de/06_Juni%202019/Modernisierung%20Anschluss%C3%BCbersicht/image-thumb__325__articleTextImage/S-Bahn-Muenchen_Header-3_v2.jpg.png" style="opacity: 40%; position: absolute; width: 1900px;"> -->
         </main>
 
-        <div class="data-area">
-            <h1>Data</h1>
-            <p>something something</p>
+        <div class="data-area" style="padding: 1vw; padding-top: 0;">
+            <h1>Settings</h1>
+            <div style="display: flex; align-self: center;">
+                <input type="text" id="input_dbgTrainID">
+                <input type="submit" value="Submit" onclick="debugSearchTrainID()">
+            </div>
         </div>
     </body>
 </html>
