@@ -3,6 +3,11 @@
   src: url(myriad-pro/MYRIADPRO-LIGHT.otf);
 }
 
+@font-face {
+  font-family: myriad-pro-regular;
+  src: url(myriad-pro/MYRIADPRO-REGULAR.OTF);
+}
+
 .data-area {
   margin-top: 1em;
   font-family: sans-serif;
@@ -14,4 +19,11 @@
   overflow-y: auto;
   background-color: #202123;
   color: white;
+}
+
+station-list-entry {
+  height: 25%;
+  display: block;
+  font-family: 'myriad-pro-regular', sans-serif;
+  font-size: 40px;
 }

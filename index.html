@@ -4,6 +4,7 @@
         <title>ET423 Web-FIS</title>
         <link rel="stylesheet" href="https://use.typekit.net/aav3vqj.css">
         <link rel="stylesheet" href="style.css">
+        <script src="script.js"></script>
     </head>
     <body style="background-color: black;">
         <main style="width: 1900px; height: 535px; background-color: #ffffff; margin: auto;">
@@ -11,23 +12,27 @@
                 <div style="height: 78.5%; width: 100%; display: flex;">
                     <div style="width: 60.74%; height: 100%;">
                         <div style="height: 34%;display: flex;">
-                            <div style="height: 100%;width: 17.5%;">
-
+                            <div style="height: 100%;width: 17.5%; font-family: 'myriad-pro-regular', sans-serif; font-size: 25px;">
+                                <span id="plannedArrivalNextStop" style="padding-left: 20px; top: 52%; position: relative;"></span>
+                                <span id="delayNextStop" style="padding-left: 50px; top: 52%; position: relative;"></span>
                             </div>
-                            <div style="height: 100%; font-family: 'myriad-pro-condensed', sans-serif;">
+                            <div style="height: 100%;">
                                 <div style="width: 100%; font-size: 24px; font-family: 'myriad-pro', sans-serif; padding-top: 8px; padding-left: 2px;">
-                                    <span id="stationActionDE">Nächster Halt</span>
-                                    <i id="stationActionEN" style="color: #666666;">Next stop</i>
+                                    <span id="stationActionDE"></span>
+                                    <i id="stationActionEN" style="color: #666666;"></i>
                                 </div>
-                                <div style="height: 74%; width: 100%; font-size: 75px;display: inline-flex;">
-                                    <span id="nextStopDE" style="padding-right: 15px;">Ostbahnhof</span>
-                                    <i id="nextStopEN" style="color: #666666;padding-right: 15px;">Munich East</i>
-                                    <svg style="height: 60px;align-self: center;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(102, 102, 102);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(102, 102, 102);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(102, 102, 102);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
+                                <div id="nextStopContainer" style="height: 74%; width: 100%; font-size: 75px;display: inline-flex; font-family: 'myriad-pro-condensed', sans-serif;">
+                                    <span id="nextStopDE" style="padding-right: 15px;"></span>
+                                    <i id="nextStopEN" style="color: #666666;padding-right: 15px;"></i>
+                                    <svg id="nextStopRVFV" style="height: 60px;align-self: center; display:none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(102, 102, 102);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(102, 102, 102);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(102, 102, 102);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(102, 102, 102);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
                                 </div>
                             </div>
                         </div>
-                        <div style="height: 66%; background-color: #E6E6E6;">
-
+                        <div id="stationDetails" style="display: none; height: 66%; background-color: #E6E6E6;">
+                            
+                        </div>
+                        <div id="stationList" style="height: 66%; background-color: #E6E6E6; overflow: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                            
                         </div>
                     </div>
                     <div style="width: 39.26%; background-color: black; height: 100%;">
@@ -36,19 +41,52 @@
                 </div>
                 <div style="height: 21.5%; vertical-align: bottom; background-image: linear-gradient(to right, #004679, #0F86D8); display: flex; flex-direction: column;">
                     <div style="height: 89.6%;  display: flex;align-items: center;">
-                        <img id="currentLineNumber" src="icons/München_S_generic.svg" style="display: table-cell; width: 147px; padding: 25px;padding-left: 30px;">
+                        <svg style="display: table-cell; width: 147px; padding: 25px;padding-left: 30px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 465"><g id="genericLineIcon"><path id="lineNumberFill" fill="#963833" d="M787.5,0H272.173C143.773,0,0,104.088,0,232.488c0,128.4,143.773,232.488,272.173,232.488H787.5      c128.4,0,272.174-104.088,272.174-232.488C1059.674,104.088,915.901,0,787.5,0z" style="fill:#008e4e;fill-opacity:1" /><g><path id="lineNumberText" fill="#ffffff" d="m 470.86748,299.015 c 0.504,14.616 1.512,56.448 61.487,56.448 8.568,0 53.928,0 53.928,-41.328 0,-17.136 -7.056,-28.728 -31.248,-35.28 l -89.208,-23.184 c -25.2,-6.552 -90.216,-23.688 -90.216,-99.791 0,-58.968 44.352,-113.904 153.215,-113.904 142.127,0 148.175,77.112 148.679,115.919 h -102.309 c 0,-11.088 0.504,-50.399 -47.879,-50.399 -29.232,0 -47.88,16.632 -47.88,38.304 0,26.712 22.176,33.264 36.792,37.296 l 68.04,17.64 c 48.384,12.6 105.84,27.72 105.84,104.832 0,81.144 -69.553,117.432 -160.776,117.432 -37.8,0 -98.783,-6.049 -132.047,-43.344 -26.712,-29.232 -27.216,-65.016 -27.72,-80.641 z" /></g></g></svg>
                         
-                        <span id="finalDestinationDE" style="font-family: 'myriad-pro-light', sans-serif; color: #ffffff;  font-size: 77px;font-style: normal;font-weight: 700;letter-spacing: 1.2px;"></span>
-                        <svg style="height: 60px; padding: 20px;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(255, 255, 255);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(255, 255, 255);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(255, 255, 255);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
-                        <span id="digitalClock" style="font-family: 'myriad-pro', sans-serif; color: #ffffff;  display: table-cell;font-size: 40px;font-style: normal;font-weight: 700; padding-right: 30px; text-align: right;margin-left: auto;">00:00</span>
+                        <span id="finalDestinationDE" style="font-family: 'myriad-pro-light', sans-serif; color: #ffffff;  font-size: 77px;font-style: normal;font-weight: 700;letter-spacing: 1.2px; padding-right: 15px;"></span>
+                        <i id="finalDestinationEN" style="font-family: 'myriad-pro-light', sans-serif; font-size: 77px; color: #ffffff;"></i>
+                        <svg id="finalDestinationRVFV" style="height: 60px; padding: 10px; display:none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><g><circle cx="22.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><polygon points="36.5 43.5 38.5 46.5 21.5 46.5 23.5 43.5 36.5 43.5" style="fill: rgb(255, 255, 255);"></polygon><circle cx="36.5" cy="35.5" r="3" style="fill: rgb(255, 255, 255);"></circle><path d="M19.5,21.59V18.24a3.73428,3.73428,0,0,1,3.74-3.74H35.76a3.73428,3.73428,0,0,1,3.74,3.74v3.35a3.90927,3.90927,0,0,1-3.91,3.91H23.41A3.90927,3.90927,0,0,1,19.5,21.59Z" style="fill: rgb(255, 255, 255);"></path><path d="M30.5.5a29,29,0,1,0,29,29A28.99518,28.99518,0,0,0,30.5.5Zm10.62344,50-1.42372-2H20.13945l-1.36056,2H14.5l6.76-8.7a8.03977,8.03977,0,0,1-4.76-7.33V13.44A4.9378,4.9378,0,0,1,21.44,8.5H37.56a4.9378,4.9378,0,0,1,4.94,4.94V34.47a8.029,8.029,0,0,1-4.19,7.05L45.5,50.5Z" style="fill: rgb(255, 255, 255);"></path><rect width="60" height="60" style="fill: none;"></rect></g></svg>
+
+                        <p id="digitalClock" style="font-family: 'myriad-pro', sans-serif; color: #ffffff;  display: table-cell;font-size: 40px;font-style: normal;font-weight: 700; padding-right: 30px; text-align: right;margin-left: auto;">00<span style="opacity: 0;">:</span>00</p>
+                        <script>
+                            function updateClock() {
+                                const date = new Date();
+                                let h = date.getHours();
+                                let m = date.getMinutes();
+                                let delimiter = '<span style="opacity: 1;">:</span>';
+
+                                if(h < 10) {h = "0" + h};
+                                if(m < 10) {m = "0" + m};
+                                if(date.getSeconds() % 2 === 0) {delimiter = '<span style="opacity: 0;">:</span>'}
+
+                                let time = h + delimiter + m;
+
+                                document.getElementById("digitalClock").innerHTML = time;
+                                
+                                setTimeout(updateClock, 1000);
+                            }
+                            
+                            function advanceInfotainmentQueue() {
+                                currentInfotainmentIndex++;
+                                if(currentInfotainmentIndex > infotainmentQueue.length - 1) {
+                                    currentInfotainmentIndex = 0;
+                                }
+                                
+                                var player = document.getElementById("infotainmentPlayer");
+                                player.attributes = "";
+                                player.setAttribute("src", infotainmentQueue[currentInfotainmentIndex]);
+                            }
+
+                            updateClock();
+                            advanceInfotainmentQueue()
+                        </script>
                     </div>
-                    <div class="lineColoured" style="height: 10.4%; align-self: flex-end; width: 100%; background-color: #008E4E;"></div>
+                    <div class="lineStrokeColoured" style="height: 10.4%; align-self: flex-end; width: 100%; background-color: #008E4E;"></div>
                 </div>
             </div>
 
-            <script src="script.js"></script>
-
             <!-- <img src="https://www.s-bahn-muenchen-magazin.de/06_Juni%202019/Modernisierung%20Anschluss%C3%BCbersicht/image-thumb__325__articleTextImage/S-Bahn-Muenchen_Header-3_v2.jpg.png" style="opacity: 40%; position: absolute; width: 1900px;"> -->
+            <!-- <img src="./references/S3HolzRefrence.png" style="opacity: 40%; position: absolute; width: 1900px;"> -->
         </main>
 
         <div class="data-area" style="padding: 1vw; padding-top: 0;">

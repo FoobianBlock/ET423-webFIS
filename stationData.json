@@ -1,7 +1,20 @@
 {
+    "Hamburg Hbf (S-Bahn)": {
+        "rvfv": true
+    },
+    "München Hbf": {
+        "nameDE": "Hauptbahnhof",
+        "nameEN": "Central Station",
+        "rvfv": true
+    },
+    "München Hbf Gl.27-36": {
+        "nameDE": "Hauptbahnof Nord",
+        "rvfv": true
+    },
     "München Ost": {
         "nameDE": "Ostbahnhof",
-        "nameEN": "Munich East"
+        "nameEN": "Munich East",
+        "rvfv": true
     },
     "Flughafen/Airport ✈": {
         "nameDE": "Flughafen München",
@@ -12,9 +25,46 @@
     },
     "München Hbf (tief)": {
         "nameDE": "Hauptbahnhof",
-        "nameEN": "Central Station"
+        "nameEN": "Central Station",
+        "rvfv": true
+    },
+    "München St.Martin-Str.": {
+        "nameDE": "St.-Martin-Straße"
     },
     "München-Pasing": {
-        "nameDE": "Pasing"
+        "rvfv": true
+    },
+    "München Donnersbergerbrücke": {
+        "rvfv": true
+    },
+    "Petershausen(Obb)": {
+        "rvfv": true
+    },
+    "Dachau Bahnhof": {
+        "rvfv": true
+    },
+    "Deisenhofen": {
+        "rvfv": true
+    },
+    "Markt Schwaben": {
+        "rvfv": true
+    },
+    "München Heimeranplatz": {
+        "rvfv": true
+    },
+    "München Harras": {
+        "rvfv": true
+    },
+    "München-Mittersendling": {
+        "rvfv": true
+    },
+    "München Siemenswerke": {
+        "rvfv": true
+    },
+    "München-Solln": {
+        "rvfv": true
+    },
+    "Kreuzstraße": {
+        "rvfv": true
     }
 }
