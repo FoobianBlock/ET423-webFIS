@@ -1,5 +1,25 @@
 {
     "Hamburg Hbf (S-Bahn)": {
+        "nameDE": "Hauptbahnhof",
+        "nameEN": "Central Station",
+        "rvfv": true
+    },
+    "Hamburg-Altona(S)": {
+        "rvfv": true
+    },
+    "Hamburg Dammtor": {
+        "rvfv": true
+    },
+    "Hamburg-Eidelstedt": {
+        "rvfv": true
+    },
+    "Hamburg-Harburg(S)": {
+        "rvfv": true
+    },
+    "Hamburg-Holstenstraße": {
+        "rvfv": true
+    },
+    "Hamburg-Bergdorf": {
         "rvfv": true
     },
     "München Hbf": {
@@ -30,6 +50,9 @@
     },
     "München St.Martin-Str.": {
         "nameDE": "St.-Martin-Straße"
+    },
+    "Furth(b Deisenhofen)": {
+        "nameDE": "Furth"
     },
     "München-Pasing": {
         "rvfv": true
@@ -65,6 +88,36 @@
         "rvfv": true
     },
     "Kreuzstraße": {
+        "rvfv": true
+    },
+    "Mammendorf": {
+        "rvfv": true
+    },
+    "Holzkirchen": {
+        "rvfv": true
+    },
+    "Starnberg": {
+        "rvfv": true
+    },
+    "Tutzing": {
+        "rvfv": true
+    },
+    "Grafing Stadt": {
+        "rvfv": true
+    },
+    "Grafing Bahnhof": {
+        "rvfv": true
+    },
+    "Ebersberg(Oberbay)": {
+        "rvfv": true
+    },
+    "München-Feldmoching": {
+        "rvfv": true
+    },
+    "München-Moosach": {
+        "rvfv": true
+    },
+    "Geltendorf": {
         "rvfv": true
     }
 }

@@ -35,10 +35,10 @@
    inkscape:current-layer="Muenchen_S7" />
 
 <g
-   id="Muenchen_S7">
+   id="genericLineIcon">
 
     <path
-   id="Ei"
+   id="fill"
    fill="#963833"
    d="M787.5,0H272.173C143.773,0,0,104.088,0,232.488c0,128.4,143.773,232.488,272.173,232.488H787.5      c128.4,0,272.174-104.088,272.174-232.488C1059.674,104.088,915.901,0,787.5,0z"
    style="fill:#008e4e;fill-opacity:1" />
