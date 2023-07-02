@@ -29,6 +29,7 @@ socket.onmessage = function(e) {
     var wsContent = JSON.parse(e.data).content;
 
     if(wsContent.length > 0) {
+        console.log(wsContent);
         setupLine(wsContent[0]);
     }
 }
@@ -53,16 +54,17 @@ function resetDisplay() {
     document.getElementById("finalDestinationRVFV").style.display = "none";
     document.getElementById("lineNumberFill").style.fill = '#008E4E';
     document.getElementById("lineNumberText").style.fill = "#FFFFFF"
+    document.getElementById("nextStopNextStop").style.display = "none";
+    document.getElementById("firstStopNextStop").style.display = "none";
 
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
         lineStrokeColouredElements[i].style.backgroundColor = '#008E4E';
+        lineStrokeColouredElements[i].style.fill = '#008E4E';
     }
 }
 
 function setupLine(lineData) {
-    console.log(lineData);
-
     document.getElementById("finalDestinationDE").innerText = getStationNameDE(lineData.destination);
     document.getElementById("finalDestinationEN").innerText = getStationNameEN(lineData.destination);
     document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(lineData.destination) ? "revert" : "none";
@@ -72,6 +74,7 @@ function setupLine(lineData) {
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
         lineStrokeColouredElements[i].style.backgroundColor = lineData.stroke;
+        lineStrokeColouredElements[i].style.fill = lineData.stroke;
     }
 
     stations = lineData.stations;
@@ -96,17 +99,20 @@ function setupLine(lineData) {
             let nextStopTime;
             let nextStopDelay;
 
-            if(element.state == "BOARDING") {
+            clearInterval(activeDepartureTimerInterval);
+            
+            if(element.state == "BOARDING") {    
                 // First Station
                 if(i === 0) {
-                    if(activeDepartureTimerInterval != null) {
-                        clearInterval(activeDepartureTimerInterval);
-                    }
+                    document.getElementById("firstStopNextStop").style.display = "block";
+                    document.getElementById("nextStopNextStop").style.display = "none";
 
+                    updateDepartureTime();
                     activeDepartureTimerInterval = setInterval(updateDepartureTime, 30000);
                 }
                 else {
-                    clearInterval(activeDepartureTimerInterval);
+                    document.getElementById("firstStopNextStop").style.display = "none";
+                    document.getElementById("nextStopNextStop").style.display = "block";
 
                     document.getElementById("stationActionDE").innerText = "Abfahrt";
                     document.getElementById("stationActionEN").innerText = "Departure";
@@ -117,6 +123,9 @@ function setupLine(lineData) {
                 nextStopDelay = Math.round(element.departureDelay / 60000);
             }
             else {
+                document.getElementById("firstStopNextStop").style.display = "none";
+                document.getElementById("nextStopNextStop").style.display = "block";
+
                 document.getElementById("stationActionDE").innerText = "Nächster Halt";
                 document.getElementById("stationActionEN").innerText = "Next stop";
                 document.getElementById("stationActionDepartureTime").innerText = "";
