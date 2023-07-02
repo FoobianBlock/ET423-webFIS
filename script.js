@@ -93,6 +93,9 @@ function setupLine(lineData) {
                 document.getElementById("nextStopEN").style.display = "none";
             }
             
+            let nextStopTime;
+            let nextStopDelay;
+
             if(element.state == "BOARDING") {
                 // First Station
                 if(i === 0) {
@@ -109,23 +112,28 @@ function setupLine(lineData) {
                     document.getElementById("stationActionEN").innerText = "Departure";
                     document.getElementById("stationActionDepartureTime").innerText = "";
                 }
+
+                nextStopTime = new Date(element.aimedDepartureTime);
+                nextStopDelay = Math.round(element.departureDelay / 60000);
             }
             else {
                 document.getElementById("stationActionDE").innerText = "Nächster Halt";
                 document.getElementById("stationActionEN").innerText = "Next stop";
                 document.getElementById("stationActionDepartureTime").innerText = "";
+
+                nextStopTime = new Date(element.aimedArrivalTime);
+                nextStopDelay = Math.round(element.arrivalDelay / 60000);
             }
 
-            const aimedArrivialTime = new Date(element.aimedArrivalTime);
-            let h = aimedArrivialTime.getHours();
-            let m = aimedArrivialTime.getMinutes();
+            let h = nextStopTime.getHours();
+            let m = nextStopTime.getMinutes();
     
             if(h < 10) {h = "0" + h};
             if(m < 10) {m = "0" + m};
             
             document.getElementById("plannedArrivalNextStop").textContent = h + ":" + m;
 
-            document.getElementById("delayNextStop").textContent = "+" + Math.round(element.arrivalDelay / 60000);
+            document.getElementById("delayNextStop").textContent = "+" + nextStopDelay;
 
             break;
         }
