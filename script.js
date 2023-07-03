@@ -11,7 +11,7 @@ let activeDepartureTimerInterval;
 const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Petershausen(Obb)":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
 let stationData = JSON.parse(stationDataJson);
 let nextStationIndex = 0;
-let stations;
+let lineData;
 
 socket.onopen = function(e) {
     const paramTrainId = params.get("trainid");
@@ -64,20 +64,21 @@ function resetDisplay() {
     }
 }
 
-function setupLine(lineData) {
-    document.getElementById("finalDestinationDE").innerText = getStationNameDE(lineData.destination);
-    document.getElementById("finalDestinationEN").innerText = getStationNameEN(lineData.destination);
-    document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(lineData.destination) ? "revert" : "none";
-    document.getElementById("lineNumberFill").style.fill = lineData.color;
-    document.getElementById("lineNumberText").style.fill = lineData.text_color;
+function setupLine(data) {
+    document.getElementById("finalDestinationDE").innerText = getStationNameDE(data.destination);
+    document.getElementById("finalDestinationEN").innerText = getStationNameEN(data.destination);
+    document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(data.destination) ? "revert" : "none";
+    document.getElementById("lineNumberFill").style.fill = data.color;
+    document.getElementById("lineNumberText").style.fill = data.text_color;
 
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
-        lineStrokeColouredElements[i].style.backgroundColor = lineData.stroke;
-        lineStrokeColouredElements[i].style.fill = lineData.stroke;
+        lineStrokeColouredElements[i].style.backgroundColor = data.stroke;
+        lineStrokeColouredElements[i].style.fill = data.stroke;
     }
 
-    stations = lineData.stations;
+    lineData = data;
+    const stations = data.stations;
 
     for (let i = 0; i < stations.length; i++) {
         const element = stations[i];
@@ -108,7 +109,7 @@ function setupLine(lineData) {
                     document.getElementById("nextStopNextStop").style.display = "none";
 
                     updateDepartureTime();
-                    activeDepartureTimerInterval = setInterval(updateDepartureTime, 30000);
+                    activeDepartureTimerInterval = setInterval(updateDepartureTime, 15000);
                 }
                 else {
                     document.getElementById("firstStopNextStop").style.display = "none";
@@ -167,7 +168,7 @@ function setupLine(lineData) {
 }
 
 function updateDepartureTime() {
-    const element = stations[0];
+    const element = lineData.stationss[0];
     const relativeDepartureTime = new Date(element.departureTime + element.departureDelay) - Date.now();
 
     if(relativeDepartureTime > 60000) {
@@ -255,8 +256,11 @@ class stationListEntry extends HTMLElement {
         arrowContainer.style.fontSize = '25px';
         const plannedArrivalTime = document.createElement('span');
         plannedArrivalTime.style.paddingLeft = '20px';
+        const svgContainer = document.createElement('div');
+        svgContainer.style.position = 'relative';
+        svgContainer.style.left = '8px';
         const delay = document.createElement('span');
-        delay.style.paddingLeft = '50px';
+        delay.style.paddingLeft = '10px';
         const nameDE = document.createElement('span');
         nameDE.style.paddingRight = '5px';
         const nameEN = document.createElement('i');
@@ -275,6 +279,7 @@ class stationListEntry extends HTMLElement {
         container.appendChild(rvfvIcon);
 
         arrowContainer.appendChild(plannedArrivalTime);
+        arrowContainer.appendChild(svgContainer);
         arrowContainer.appendChild(delay);
     }
 
@@ -292,9 +297,26 @@ class stationListEntry extends HTMLElement {
         if(h < 10) {h = "0" + h};
         if(m < 10) {m = "0" + m};
 
-        container.children[0].children[0].textContent = h + ":" + m;
-        container.children[0].children[1].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
-        
+        const arrowContainer = container.children[0];
+
+        arrowContainer.children[0].textContent = h + ":" + m;
+        arrowContainer.children[2].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
+
+        let svgData;
+        if(stationData.cancelled) {
+            svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+        }
+        else {
+            svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;fill:#ffffff;" id="circle3872" cx="20" cy="35" r="6" d="m 26,35 a 6,6 0 0 1 -6,6 6,6 0 0 1 -6,-6 6,6 0 0 1 6,-6 6,6 0 0 1 6,6 z" /><path id="lpe_path-effect3874" style="fill:#ffffff;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 22,16 a 6,6 0 0 0 -6,-6 6,6 0 0 0 -6,6 6,6 0 0 0 6,6 6,6 0 0 0 6,-6 z" /></clipPath></defs><g id="layer3" style="display:inline;fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" /><path style="display:inline;fill:#ffffff;" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" /><rect style="display:inline;fill:#ffffff;" class="lineStrokeColoured" width="6" height="25" x="17" y="0" /></g></svg>';
+        }
+
+        arrowContainer.children[1].innerHTML = svgData;
+        const lineStrokeColouredElements = arrowContainer.getElementsByClassName("lineStrokeColoured")
+        for (let i = 0; i < lineStrokeColouredElements.length; i++) {
+            lineStrokeColouredElements[i].style.backgroundColor = lineData.stroke;
+            lineStrokeColouredElements[i].style.fill = lineData.stroke;
+        }
+
         const stationNameEN = getStationNameEN(stationData.stationName);
         if(stationNameEN != null) {            
             container.children[2].textContent = stationNameEN;
