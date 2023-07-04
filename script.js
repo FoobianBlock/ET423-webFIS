@@ -156,11 +156,11 @@ function setupLine(data) {
     
     for (let i = 0; i < stations.length; i++) {    
         if(i >= stationListElement.childElementCount) {
-            stationListElement.appendChild(newStationListEntry(stations[i]));
+            stationListElement.appendChild(newStationListEntry(stations[i], i));
         }
 
         const element = stationListElement.children[i];
-        element.updateEntry(stations[i]);
+        element.updateEntry(stations[i], i);
         element.style.backgroundColor = ((nextStationIndex - i) % 2 === 0) ? '#FFFFFF' : '#E6E6E6';
         
         element.style.display = i > nextStationIndex ? 'block' : 'none';
@@ -183,9 +183,9 @@ function updateDepartureTime() {
     }
 }
 
-function newStationListEntry(stationData) {
+function newStationListEntry(stationData, i) {
     let element = document.createElement("station-list-entry");
-    element.updateEntry(stationData);
+    element.updateEntry(stationData, i);
     return element;
 }
 
@@ -284,7 +284,7 @@ class stationListEntry extends HTMLElement {
     }
 
     // Update the text content based on the data string
-    updateEntry(stationData) {
+    updateEntry(stationData, i) {
         const container = this.shadowRoot.querySelector('div');
 
         // Update the text content
@@ -303,11 +303,21 @@ class stationListEntry extends HTMLElement {
         arrowContainer.children[2].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
 
         let svgData;
-        if(stationData.cancelled) {
-            svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+
+        if(i === (lineData.stations.length - 1)) {
+            if(stationData.cancelled) {
+            }
+            else {
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#ffffff"><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="34" x="17" y="0" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
+            }
         }
         else {
-            svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;fill:#ffffff;" id="circle3872" cx="20" cy="35" r="6" d="m 26,35 a 6,6 0 0 1 -6,6 6,6 0 0 1 -6,-6 6,6 0 0 1 6,-6 6,6 0 0 1 6,6 z" /><path id="lpe_path-effect3874" style="fill:#ffffff;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 22,16 a 6,6 0 0 0 -6,-6 6,6 0 0 0 -6,6 6,6 0 0 0 6,6 6,6 0 0 0 6,-6 z" /></clipPath></defs><g id="layer3" style="display:inline;fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" /><path style="display:inline;fill:#ffffff;" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" /><rect style="display:inline;fill:#ffffff;" class="lineStrokeColoured" width="6" height="25" x="17" y="0" /></g></svg>';
+            if(stationData.cancelled) {
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+            }
+            else {
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
+            }
         }
 
         arrowContainer.children[1].innerHTML = svgData;
