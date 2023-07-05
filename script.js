@@ -3,11 +3,14 @@ const socket = new WebSocket('wss://api.geops.io/realtime-ws/v1/?key=5cc87b12d7c
 
 const params = new URLSearchParams(document.location.search)
 
-let currentTrain;
+let leftPanelViewIndex = 0;
 let currentInfotainmentIndex = 0;
 const infotainmentQueue = Object.seal(["https://assets.static-bahn.de/dam/jcr:5e33cbde-1254-4241-a8d4-2f6dcb605d47/220202_1080p_Erklaervideo_Simpleshow_Folienballons.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4","https://assets.static-bahn.de/dam/jcr:da1188f1-8293-4351-8ac7-f26d1dbb4b5c/220202_1080p_Erklaervideo_Simpleshow_PersonenImGleis.mp4","https://assets.static-bahn.de/dam/jcr:a0c7be5c-39a1-4cac-8593-26ef12b8dea9/220202_1080p_Erklaervideo_Simpleshow_Tuerstoerung.mp4","https://assets.static-bahn.de/dam/jcr:49af3eb3-ff25-4de5-97a8-3f8ce9aa4f3a/220202_1080p_Erklaervideo_Simpleshow_Bahn%C3%BCberg%C3%A4nge_Clip01.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4"]);
-let activeDepartureTimerInterval;
 
+let activeDepartureTimerInterval;
+let activeFirstStopViewInterval = null;
+
+let currentTrain;
 const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Petershausen(Obb)":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
 let stationData = JSON.parse(stationDataJson);
 let nextStationIndex = 0;
@@ -56,12 +59,15 @@ function resetDisplay() {
     document.getElementById("lineNumberText").style.fill = "#FFFFFF"
     document.getElementById("nextStopNextStop").style.display = "none";
     document.getElementById("firstStopNextStop").style.display = "none";
+    document.getElementById("welcomeLineNumber").textContent = "";
 
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
         lineStrokeColouredElements[i].style.backgroundColor = '#008E4E';
         lineStrokeColouredElements[i].style.fill = '#008E4E';
     }
+
+    updateView(0);
 }
 
 function setupLine(data) {
@@ -70,6 +76,7 @@ function setupLine(data) {
     document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(data.destination) ? "revert" : "none";
     document.getElementById("lineNumberFill").style.fill = data.color;
     document.getElementById("lineNumberText").style.fill = data.text_color;
+    document.getElementById("welcomeLineNumber").textContent = data.longName;
 
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
@@ -110,8 +117,22 @@ function setupLine(data) {
 
                     updateDepartureTime();
                     activeDepartureTimerInterval = setInterval(updateDepartureTime, 15000);
+
+                    if(activeFirstStopViewInterval === null) {
+                        activeFirstStopViewInterval = setInterval(
+                            function() { 
+                                if(leftPanelViewIndex === 2) {
+                                    updateView(0);
+                                } 
+                                else {
+                                    updateView(2); 
+                                }
+                            }, 5000);
+                    }
                 }
                 else {
+                    clearFirstStopViewInterval();
+
                     document.getElementById("firstStopNextStop").style.display = "none";
                     document.getElementById("nextStopNextStop").style.display = "block";
 
@@ -124,6 +145,8 @@ function setupLine(data) {
                 nextStopDelay = Math.round(element.departureDelay / 60000);
             }
             else {
+                clearFirstStopViewInterval();
+
                 document.getElementById("firstStopNextStop").style.display = "none";
                 document.getElementById("nextStopNextStop").style.display = "block";
 
@@ -168,7 +191,7 @@ function setupLine(data) {
 }
 
 function updateDepartureTime() {
-    const element = lineData.stationss[0];
+    const element = lineData.stations[0];
     const relativeDepartureTime = new Date(element.departureTime + element.departureDelay) - Date.now();
 
     if(relativeDepartureTime > 60000) {
@@ -180,6 +203,41 @@ function updateDepartureTime() {
         document.getElementById("stationActionDE").innerText = "Abfahrt in Kürze";
         document.getElementById("stationActionEN").innerText = "Departure soon";
         document.getElementById("stationActionDepartureTime").innerText = "";
+    }
+}
+
+function updateView(idx) {
+    leftPanelViewIndex = idx;
+
+    console.log(leftPanelViewIndex);
+
+    switch (leftPanelViewIndex) {
+        case 1: // Station Details
+            document.getElementById("welcomeScreen").style.display = 'none';
+            document.getElementById("stationList").style.display = 'none';
+
+            document.getElementById("stationDetails").style.display = 'block';
+            break;
+        case 2: // Welcome Screen
+            document.getElementById("stationList").style.display = 'none';
+            document.getElementById("stationDetails").style.display = 'none';
+
+            document.getElementById("welcomeScreen").style.display = 'block';
+            break;
+        default: // Station List
+            document.getElementById("welcomeScreen").style.display = 'none';
+            document.getElementById("stationDetails").style.display = 'none';
+
+            document.getElementById("stationList").style.display = 'block';
+            break;
+    }
+}
+
+function clearFirstStopViewInterval() {
+    if(activeFirstStopViewInterval != null) {
+        clearInterval(activeFirstStopViewInterval);
+        activeFirstStopViewInterval = null;
+        updateView(0);
     }
 }
 
@@ -249,7 +307,7 @@ class stationListEntry extends HTMLElement {
         container.style.height = '100%';
         container.style.alignItems = 'center';
         const arrowContainer = document.createElement('div');
-        arrowContainer.style.width = '17.5%';
+        arrowContainer.style.width = '202px';
         arrowContainer.style.height = '100%';
         arrowContainer.style.display = 'flex';
         arrowContainer.style.alignItems = 'center';
