@@ -127,7 +127,7 @@ function setupLine(data) {
                                 else {
                                     updateView(2); 
                                 }
-                            }, 5000);
+                            }, 30000);
                     }
                 }
                 else {
@@ -312,6 +312,8 @@ class stationListEntry extends HTMLElement {
         arrowContainer.style.display = 'flex';
         arrowContainer.style.alignItems = 'center';
         arrowContainer.style.fontSize = '25px';
+        const nameContainer = document.createElement('div');
+
         const plannedArrivalTime = document.createElement('span');
         plannedArrivalTime.style.paddingLeft = '20px';
         const svgContainer = document.createElement('div');
@@ -319,6 +321,7 @@ class stationListEntry extends HTMLElement {
         svgContainer.style.left = '8px';
         const delay = document.createElement('span');
         delay.style.paddingLeft = '10px';
+
         const nameDE = document.createElement('span');
         nameDE.style.paddingRight = '5px';
         const nameEN = document.createElement('i');
@@ -332,21 +335,27 @@ class stationListEntry extends HTMLElement {
 
         this.shadowRoot.appendChild(container);
         container.appendChild(arrowContainer);
-        container.appendChild(nameDE);
-        container.appendChild(nameEN);
-        container.appendChild(rvfvIcon);
-
+        container.appendChild(nameContainer);
+        
         arrowContainer.appendChild(plannedArrivalTime);
         arrowContainer.appendChild(svgContainer);
         arrowContainer.appendChild(delay);
+
+        nameContainer.appendChild(nameDE);
+        nameContainer.appendChild(nameEN);
+        nameContainer.appendChild(rvfvIcon);
+
+        const style = document.createElement('style');
+        // Tried styling a strikethough for cancelled stops; doesn't seem to really work though
+        // style.innerHTML = 'div.cancelled:before { content: ""; position: absolute; top: 50%; left: 0; border-bottom: 3px solid red; width: 100%; }'
+        this.shadowRoot.appendChild(style);
     }
 
     // Update the text content based on the data string
     updateEntry(stationData, i) {
         const container = this.shadowRoot.querySelector('div');
-
-        // Update the text content
-        container.children[1].textContent = getStationNameDE(stationData.stationName);
+        const arrowContainer = container.children[0];
+        const nameContainer = container.children[1];
 
         const aimedArrivialTime = new Date(stationData.aimedArrivalTime);
         let h = aimedArrivialTime.getHours();
@@ -355,26 +364,32 @@ class stationListEntry extends HTMLElement {
         if(h < 10) {h = "0" + h};
         if(m < 10) {m = "0" + m};
 
-        const arrowContainer = container.children[0];
-
-        arrowContainer.children[0].textContent = h + ":" + m;
+        arrowContainer.children[0].textContent = h + ":" + m; // Also needs to be hidden, but without destroying the layout
+        
+        arrowContainer.children[2].style.display = stationData.cancelled ? "none" : "unset";
         arrowContainer.children[2].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
 
         let svgData;
 
-        if(i === (lineData.stations.length - 1)) {
+        if(i === (lineData.stations.length - 1)) { // Last stop
             if(stationData.cancelled) {
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#666666"><rect style="fill:#666666;" width="6" height="34" x="17" y="0" /><rect style="fill:#666666;" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
             }
             else {
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#ffffff"><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="34" x="17" y="0" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
             }
         }
         else {
-            if(stationData.cancelled) {
+            if(stationData.cancelled) { // Canceled stop
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
             }
-            else {
-                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
+            else { // Normal stop
+                if(lineData.stations[i + 1].cancelled) {
+                    svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" id="svg138" sodipodi:docname="line_finalStop.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <rect style="fill:#ffffff;stroke-width:1.04319" class="lineStrokeColoured" width="6" height="37" x="17" y="0"/> <rect style="fill:#ffffff" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)"/> <rect style="fill:#666666;" width="6" height="25" x="17" y="44"/></g></svg>';
+                }
+                else {
+                    svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
+                }
             }
         }
 
@@ -385,16 +400,19 @@ class stationListEntry extends HTMLElement {
             lineStrokeColouredElements[i].style.fill = lineData.stroke;
         }
 
+        nameContainer.className = stationData.cancelled ? 'cancelled' : '';
+        nameContainer.children[0].textContent = getStationNameDE(stationData.stationName);
+
         const stationNameEN = getStationNameEN(stationData.stationName);
         if(stationNameEN != null) {            
-            container.children[2].textContent = stationNameEN;
-            container.children[2].style.display = 'revert';
+            nameContainer.children[1].textContent = stationNameEN;
+            nameContainer.children[1].style.display = 'revert';
         }
         else {
-            container.children[2].style.display = 'none';
+            nameContainer.children[1].style.display = 'none';
         }
 
-        container.children[3].style.display = getStationRVFV(stationData.stationName) ? 'revert' : 'none';
+        nameContainer.children[2].style.display = getStationRVFV(stationData.stationName) ? 'revert' : 'none';
     }
 }
 
