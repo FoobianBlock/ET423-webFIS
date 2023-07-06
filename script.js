@@ -11,7 +11,7 @@ let activeDepartureTimerInterval;
 let activeFirstStopViewInterval = null;
 
 let currentTrain;
-const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Petershausen(Obb)":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
+const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Petershausen(Obb)":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
 let stationData = JSON.parse(stationDataJson);
 let nextStationIndex = 0;
 let lineData;
@@ -74,9 +74,6 @@ function setupLine(data) {
     document.getElementById("finalDestinationDE").innerText = getStationNameDE(data.destination);
     document.getElementById("finalDestinationEN").innerText = getStationNameEN(data.destination);
     document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(data.destination) ? "revert" : "none";
-    document.getElementById("lineNumberFill").style.fill = data.color;
-    document.getElementById("lineNumberText").style.fill = data.text_color;
-    document.getElementById("lineNumberTextContent").textContent = data.shortName;
     document.getElementById("welcomeLineNumber").textContent = data.longName;
 
     const tenantDE = document.getElementById("welcomeTenantDE");
@@ -103,6 +100,36 @@ function setupLine(data) {
         }
     }
 
+    // Line Number Handling
+    let lineNumberColour;
+    let lineNumberTextColor;
+
+    if(data.longName === "S20" && data.color === "#ffffff") { // München S20 colour override
+        lineNumberColour = "#d0566c"
+        lineNumberTextColor = "#ffffff";
+    }
+    else {
+        lineNumberColour = (data.color === null) ? '#008E4E' : data.color;
+        lineNumberTextColor = (data.text_color === null) ? '#FFFFFF' : data.text_color;
+    }
+
+    document.getElementById("lineNumberFill").style.fill = lineNumberColour;
+    document.getElementById("lineNumberText").style.fill = lineNumberTextColor;
+
+    if(data.shortName.length > 3) {
+        document.getElementById("lineNumberTextContent").textContent = "S";
+
+        if(data.tenant === "sevlive") {
+            document.getElementById("lineNumberTextContent").style.fontSize = '405px';
+            document.getElementById("lineNumberTextContent").textContent = "SEV";
+        }
+    }
+    else {
+        document.getElementById("lineNumberTextContent").style.fontSize = (data.shortName.length === 3) ? '405px' : '483px';
+        document.getElementById("lineNumberTextContent").textContent = data.shortName;
+    }
+
+    // Stroke Coloured
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     const strokeCol = (data.stroke === null) ? '#008E4E' : data.stroke;
 
@@ -114,6 +141,7 @@ function setupLine(data) {
     lineData = data;
     const stations = data.stations;
 
+    // Stations
     for (let i = 0; i < stations.length; i++) {
         const element = stations[i];
         
@@ -342,6 +370,7 @@ class stationListEntry extends HTMLElement {
         arrowContainer.style.alignItems = 'center';
         arrowContainer.style.fontSize = '25px';
         const nameContainer = document.createElement('div');
+        nameContainer.style.display = 'contents';
 
         const plannedArrivalTime = document.createElement('span');
         plannedArrivalTime.style.paddingLeft = '20px';

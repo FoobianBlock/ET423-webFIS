@@ -22,6 +22,11 @@
     "Hamburg-Bergdorf": {
         "rvfv": true
     },
+    "Hauptbahnhof (S, U, Bus, Tram)": {
+        "nameDE": "Hauptbahnhof",
+        "nameEN": "Central Station",
+        "rvfv": true
+    },
     "München Hbf": {
         "nameDE": "Hauptbahnhof",
         "nameEN": "Central Station",
