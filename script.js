@@ -76,12 +76,39 @@ function setupLine(data) {
     document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(data.destination) ? "revert" : "none";
     document.getElementById("lineNumberFill").style.fill = data.color;
     document.getElementById("lineNumberText").style.fill = data.text_color;
+    document.getElementById("lineNumberTextContent").textContent = data.shortName;
     document.getElementById("welcomeLineNumber").textContent = data.longName;
 
+    const tenantDE = document.getElementById("welcomeTenantDE");
+    const tenantEN = document.getElementById("welcomeTenantEN");
+
+    if(data.operator != null) {
+        tenantDE.textContent = "Die " + data.operator;
+        tenantEN.textContent = data.operator;
+    }
+    else {
+        switch (data.tenant) {
+            case "sbh":
+                tenantDE.textContent = "Die S-Bahn Hamburg";
+                tenantEN.textContent = "S-Bahn Hamburg";
+                break;
+            case "poland-pkpic":
+                tenantDE.textContent = "PKP Intercity";
+                tenantEN.textContent = "PKP Intercity";
+                break;
+            default:
+                tenantDE.textContent = "Die S-Bahn München";
+                tenantEN.textContent = "S-Bahn München";
+                break;
+        }
+    }
+
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
+    const strokeCol = (data.stroke === null) ? '#008E4E' : data.stroke;
+
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
-        lineStrokeColouredElements[i].style.backgroundColor = data.stroke;
-        lineStrokeColouredElements[i].style.fill = data.stroke;
+        lineStrokeColouredElements[i].style.backgroundColor = strokeCol;
+        lineStrokeColouredElements[i].style.fill = strokeCol;
     }
 
     lineData = data;
@@ -143,6 +170,7 @@ function setupLine(data) {
 
                 nextStopTime = new Date(element.aimedDepartureTime);
                 nextStopDelay = Math.round(element.departureDelay / 60000);
+                document.getElementById("delayNextStop").style.display = (element.cancelled || element.departureDelay === null) ? "none" : "unset";
             }
             else {
                 clearFirstStopViewInterval();
@@ -156,6 +184,7 @@ function setupLine(data) {
 
                 nextStopTime = new Date(element.aimedArrivalTime);
                 nextStopDelay = Math.round(element.arrivalDelay / 60000);
+                document.getElementById("delayNextStop").style.display = (element.cancelled || element.arrivalDelay === null) ? "none" : "unset";
             }
 
             let h = nextStopTime.getHours();
@@ -192,7 +221,7 @@ function setupLine(data) {
 
 function updateDepartureTime() {
     const element = lineData.stations[0];
-    const relativeDepartureTime = new Date(element.departureTime + element.departureDelay) - Date.now();
+    const relativeDepartureTime = new Date(element.departureTime) - Date.now();
 
     if(relativeDepartureTime > 60000) {
         document.getElementById("stationActionDE").innerText = "Abfahrt in";
@@ -366,7 +395,7 @@ class stationListEntry extends HTMLElement {
 
         arrowContainer.children[0].textContent = h + ":" + m; // Also needs to be hidden, but without destroying the layout
         
-        arrowContainer.children[2].style.display = stationData.cancelled ? "none" : "unset";
+        arrowContainer.children[2].style.display = (stationData.cancelled || stationData.arrivalDelay === null) ? "none" : "unset";
         arrowContainer.children[2].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
 
         let svgData;
@@ -383,21 +412,28 @@ class stationListEntry extends HTMLElement {
             if(stationData.cancelled) { // Canceled stop
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
             }
-            else { // Normal stop
+            else { 
                 if(lineData.stations[i + 1].cancelled) {
                     svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" id="svg138" sodipodi:docname="line_finalStop.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <rect style="fill:#ffffff;stroke-width:1.04319" class="lineStrokeColoured" width="6" height="37" x="17" y="0"/> <rect style="fill:#ffffff" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)"/> <rect style="fill:#666666;" width="6" height="25" x="17" y="44"/></g></svg>';
                 }
                 else {
-                    svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
+                    if(stationData.noDropOff && stationData.noPickUp) { // Passing station
+                        svgData = svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+                    }
+                    else { // Normal stop
+                        svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
+                    }
                 }
             }
         }
 
         arrowContainer.children[1].innerHTML = svgData;
         const lineStrokeColouredElements = arrowContainer.getElementsByClassName("lineStrokeColoured")
+        const strokeCol = (lineData.stroke === null) ? '#008E4E' : lineData.stroke;
+
         for (let i = 0; i < lineStrokeColouredElements.length; i++) {
-            lineStrokeColouredElements[i].style.backgroundColor = lineData.stroke;
-            lineStrokeColouredElements[i].style.fill = lineData.stroke;
+            lineStrokeColouredElements[i].style.backgroundColor = strokeCol;
+            lineStrokeColouredElements[i].style.fill = strokeCol;
         }
 
         nameContainer.className = stationData.cancelled ? 'cancelled' : '';
