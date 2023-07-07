@@ -60,6 +60,7 @@ function resetDisplay() {
     document.getElementById("nextStopNextStop").style.display = "none";
     document.getElementById("firstStopNextStop").style.display = "none";
     document.getElementById("welcomeLineNumber").textContent = "";
+    document.getElementById("delayNextStop").textContent = "";
 
     const lineStrokeColouredElements = document.getElementsByClassName("lineStrokeColoured")
     for (let i = 0; i < lineStrokeColouredElements.length; i++) {
@@ -120,12 +121,12 @@ function setupLine(data) {
         document.getElementById("lineNumberTextContent").textContent = "S";
 
         if(data.tenant === "sevlive") {
-            document.getElementById("lineNumberTextContent").style.fontSize = '405px';
+            document.getElementById("lineNumberTextContent").style.fontSize = '430px';
             document.getElementById("lineNumberTextContent").textContent = "SEV";
         }
     }
     else {
-        document.getElementById("lineNumberTextContent").style.fontSize = (data.shortName.length === 3) ? '405px' : '483px';
+        document.getElementById("lineNumberTextContent").style.fontSize = (data.shortName.length === 3) ? '430px' : '483px';
         document.getElementById("lineNumberTextContent").textContent = data.shortName;
     }
 
@@ -169,6 +170,7 @@ function setupLine(data) {
                 if(i === 0) {
                     document.getElementById("firstStopNextStop").style.display = "block";
                     document.getElementById("nextStopNextStop").style.display = "none";
+                    document.getElementById("lastStopNextStop").style.display = "none";
 
                     updateDepartureTime();
                     activeDepartureTimerInterval = setInterval(updateDepartureTime, 15000);
@@ -188,8 +190,16 @@ function setupLine(data) {
                 else {
                     clearFirstStopViewInterval();
 
-                    document.getElementById("firstStopNextStop").style.display = "none";
-                    document.getElementById("nextStopNextStop").style.display = "block";
+                    if(i === stations.length - 1) {
+                        document.getElementById("firstStopNextStop").style.display = "none";
+                        document.getElementById("nextStopNextStop").style.display = "none";
+                        document.getElementById("lastStopNextStop").style.display = "block";
+                    }
+                    else {
+                        document.getElementById("firstStopNextStop").style.display = "none";
+                        document.getElementById("nextStopNextStop").style.display = "block";
+                        document.getElementById("lastStopNextStop").style.display = "none";
+                    }
 
                     document.getElementById("stationActionDE").innerText = "Abfahrt";
                     document.getElementById("stationActionEN").innerText = "Departure";
@@ -202,9 +212,17 @@ function setupLine(data) {
             }
             else {
                 clearFirstStopViewInterval();
-
-                document.getElementById("firstStopNextStop").style.display = "none";
-                document.getElementById("nextStopNextStop").style.display = "block";
+                
+                if(i === stations.length - 1) {
+                    document.getElementById("firstStopNextStop").style.display = "none";
+                    document.getElementById("nextStopNextStop").style.display = "none";
+                    document.getElementById("lastStopNextStop").style.display = "block";
+                }
+                else {
+                    document.getElementById("firstStopNextStop").style.display = "none";
+                    document.getElementById("nextStopNextStop").style.display = "block";
+                    document.getElementById("lastStopNextStop").style.display = "none";
+                }
 
                 document.getElementById("stationActionDE").innerText = "Nächster Halt";
                 document.getElementById("stationActionEN").innerText = "Next stop";
@@ -409,7 +427,7 @@ class stationListEntry extends HTMLElement {
         this.shadowRoot.appendChild(style);
     }
 
-    // Update the text content based on the data string
+    // Update the content based on the data object
     updateEntry(stationData, i) {
         const container = this.shadowRoot.querySelector('div');
         const arrowContainer = container.children[0];
@@ -440,6 +458,7 @@ class stationListEntry extends HTMLElement {
         else {
             if(stationData.cancelled) { // Canceled stop
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+                // Add aditional check if any stop afterwards is not canceled (even though I have no idea how that would be displayed)
             }
             else { 
                 if(lineData.stations[i + 1].cancelled) {
