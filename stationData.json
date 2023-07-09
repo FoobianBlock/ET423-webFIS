@@ -59,13 +59,14 @@
     "Furth(b Deisenhofen)": {
         "nameDE": "Furth"
     },
+    "Petershausen(Obb)": {
+        "nameDE": "Petershausen",
+        "rvfv": true
+    },
     "München-Pasing": {
         "rvfv": true
     },
     "München Donnersbergerbrücke": {
-        "rvfv": true
-    },
-    "Petershausen(Obb)": {
         "rvfv": true
     },
     "Dachau Bahnhof": {

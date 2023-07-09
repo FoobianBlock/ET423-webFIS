@@ -11,9 +11,10 @@ let activeDepartureTimerInterval;
 let activeFirstStopViewInterval = null;
 
 let currentTrain;
-const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Petershausen(Obb)":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
+const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Petershausen(Obb)":{"nameDE":"Petershausen","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
 let stationData = JSON.parse(stationDataJson);
 let nextStationIndex = 0;
+let canceledStopEntires = [];
 let lineData;
 
 socket.onopen = function(e) {
@@ -146,7 +147,7 @@ function setupLine(data) {
     for (let i = 0; i < stations.length; i++) {
         const element = stations[i];
         
-        if(element.state != "LEAVING" && element.state != "JOURNEY_CANCELLED") {
+        if(element.state != "LEAVING" && element.state != "JOURNEY_CANCELLED" && element.state != "STOP_CANCELLED") { // Conditions for something to be considered a "Next stop"
             nextStationIndex = i;
 
             document.getElementById("nextStopDE").innerText = getStationNameDE(element.stationName);
@@ -450,23 +451,44 @@ class stationListEntry extends HTMLElement {
         if(i === (lineData.stations.length - 1)) { // Last stop
             if(stationData.cancelled) {
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#666666"><rect style="fill:#666666;" width="6" height="34" x="17" y="0" /><rect style="fill:#666666;" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
+                canceledStopEntires.push(container);
             }
             else {
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#ffffff"><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="34" x="17" y="0" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
+                tintCanceledStops();
             }
         }
         else {
             if(stationData.cancelled) { // Canceled stop
                 svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
                 // Add aditional check if any stop afterwards is not canceled (even though I have no idea how that would be displayed)
+                canceledStopEntires.push(container);
             }
             else { 
+                let finalBeforeCancelled = false;
+
                 if(lineData.stations[i + 1].cancelled) {
+                    finalBeforeCancelled = true;
+
+                    for (let j = i + 1; j < lineData.stations.length; j++) {
+                        const element = lineData.stations[j];
+                        
+                        if(!element.cancelled) {
+                            finalBeforeCancelled = false;
+                            break;
+                        }
+                    }
+
+                    console.log(finalBeforeCancelled);
+                }
+                
+                if(finalBeforeCancelled) { // Normal stop with only cancelled stops afterwards (Early terminus)
                     svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" id="svg138" sodipodi:docname="line_finalStop.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <rect style="fill:#ffffff;stroke-width:1.04319" class="lineStrokeColoured" width="6" height="37" x="17" y="0"/> <rect style="fill:#ffffff" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)"/> <rect style="fill:#666666;" width="6" height="25" x="17" y="44"/></g></svg>';
                 }
                 else {
+                    tintCanceledStops();
                     if(stationData.noDropOff && stationData.noPickUp) { // Passing station
-                        svgData = svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+                        svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
                     }
                     else { // Normal stop
                         svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
@@ -498,6 +520,20 @@ class stationListEntry extends HTMLElement {
 
         nameContainer.children[2].style.display = getStationRVFV(stationData.stationName) ? 'revert' : 'none';
     }
+}
+
+function tintCanceledStops() {
+    canceledStopEntires.forEach(element => {
+        console.log("c");
+        element.children[0].children[1].innerHTML = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+        
+        const lineStrokeColouredElements = element.getElementsByClassName("lineStrokeColoured")
+        const strokeCol = (lineData.stroke === null) ? '#008E4E' : lineData.stroke;
+        lineStrokeColouredElements[0].style.backgroundColor = strokeCol;
+        lineStrokeColouredElements[0].style.fill = strokeCol;
+    });
+
+    canceledStopEntires = [];
 }
 
 // Register the custom element
