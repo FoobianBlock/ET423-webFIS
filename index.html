@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <title>ET423 Web-FIS</title>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <title>ET423 WebFIS</title>
         <link rel="stylesheet" href="https://use.typekit.net/aav3vqj.css">
         <link rel="stylesheet" href="style.css">
         <script src="script.js"></script>
@@ -147,5 +148,53 @@
                 </div>
             </div>
         </div>
+
+        <script type='text/javascript'> // Generate dynamic OpenGraph tags
+            document.addEventListener("DOMContentLoaded", () => {
+                const socket = new WebSocket('wss://api.geops.io/realtime-ws/v1/?key=5cc87b12d7c5370001c1d655112ec5c21e0f441792cfc2fafe3e7a1e');
+                const paramTrainId = new URLSearchParams(document.location.search).get("trainid");
+    
+                socket.onopen = function(e) {
+                    if(paramTrainId != null) {
+                        socket.send(`GET trajectory`);
+                    }
+                }
+    
+                socket.onmessage = function(e) {
+                    const data = JSON.parse(e.data).content;
+                    console.log(data);
+                    
+                    if(data.properties != undefined) { // Check for undefined to avoid an error when the initial 'open' is sent
+                        if(data.properties.train_id == paramTrainId) {
+                            socket.close(); // Close the socket when the specific train_id has been found
+                            
+                            const title = "ET423 WebFIS: ZN " + data.properties.train_number;
+                            const embedColor = data.properties.line.stroke;
+
+                            var rakeOutput = '';
+                            if(data.properties.rake == null) {
+                                rakeOutput = "Unbekannter Zugverband"
+                            }
+                            else {
+                                const rakeArray = data.properties.rake.split(";");
+                                rakeArray.forEach(UIC => {
+                                    if(UIC != "0" && UIC.length == 12) {
+                                        if(rakeOutput != '') {
+                                            rakeOutput += " + "
+                                        }
+                                        rakeOutput += UIC.substring(5, 8) + " " + UIC.substring(8, 11) + "-" + UIC.charAt(11);
+                                    }
+                                });
+                            }
+                            const description = rakeOutput + " auf der " + data.properties.line.name;
+                            
+                            document.head.append('<meta property="og:title" content="' +  title + '">' );
+                            document.head.append('<meta property="og:description" content="' +  description + '">' );
+                            document.head.append('<meta name="theme-color" content="' + embedColor + '">');
+                        }
+                    }
+                }
+            });
+        </script>   
     </body>
 </html>
