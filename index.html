@@ -6,6 +6,8 @@
         <link rel="stylesheet" href="https://use.typekit.net/aav3vqj.css">
         <link rel="stylesheet" href="style.css">
         <script src="script.js"></script>
+        <meta name="og:site_name" content="ET423 WebFIS">
+        <meta name="og:type" content="website">
     </head>
     <body style="background-color: black;">
         <main style="width: 1900px; height: 535px; background-color: #ffffff; margin: auto;">
@@ -187,9 +189,7 @@
                                 });
                             }
                             const description = rakeOutput + " auf der " + data.properties.line.name;
-                            
-                            document.head.append('<meta name="og:site_name" content="ET423 WebFIS">')
-                            document.head.append('<meta name="og:type" content="website">')
+                                                                                    
                             document.head.append('<meta property="og:title" content="' +  title + '">' );
                             document.head.append('<meta property="og:description" content="' +  description + '">' );
                             document.head.append('<meta name="theme-color" content="' + embedColor + '">');
