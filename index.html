@@ -168,7 +168,7 @@
                         if(data.properties.train_id == paramTrainId) {
                             socket.close(); // Close the socket when the specific train_id has been found
                             
-                            const title = "ET423 WebFIS: ZN " + data.properties.train_number;
+                            const title = data.properties.train_number;
                             const embedColor = data.properties.line.stroke;
 
                             var rakeOutput = '';
@@ -188,6 +188,8 @@
                             }
                             const description = rakeOutput + " auf der " + data.properties.line.name;
                             
+                            document.head.append('<meta name="og:site_name" content="ET423 WebFIS">')
+                            document.head.append('<meta name="og:type" content="website">')
                             document.head.append('<meta property="og:title" content="' +  title + '">' );
                             document.head.append('<meta property="og:description" content="' +  description + '">' );
                             document.head.append('<meta name="theme-color" content="' + embedColor + '">');
