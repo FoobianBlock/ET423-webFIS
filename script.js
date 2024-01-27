@@ -1,7 +1,7 @@
-const socket = new WebSocket('wss://api.geops.io/realtime-ws/v1/?key=5cc87b12d7c5370001c1d655112ec5c21e0f441792cfc2fafe3e7a1e');
-// const socket = new WebSocket('wss://tralis-tracker-api.geops.io/ws?key=5cc87b12d7c5370001c1d655babfd9dc82ef43d99b1f12763a1ca6b4');
-
 const params = new URLSearchParams(document.location.search)
+
+let socket = null;
+let socketPingInterval = -1;
 
 let leftPanelViewIndex = 0;
 let currentInfotainmentIndex = 0;
@@ -17,35 +17,55 @@ let nextStationIndex = 0;
 let canceledStopEntires = [];
 let lineData;
 
-socket.onopen = function(e) {
-    const paramTrainId = params.get("trainid");
-    if(paramTrainId != null) {
-        currentTrain = paramTrainId;
-        socket.send(`SUB stopsequence_${currentTrain}`);
-        updateLine();
+function setupSocket() {
+    if(socket != null) {
+        socket.close();
     }
 
-    resetDisplay();
-    document.getElementById("fullScreenError").style.display = 'none';
-}
+    socket = new WebSocket('wss://api.geops.io/realtime-ws/v1/?key=5cc87b12d7c5370001c1d655112ec5c21e0f441792cfc2fafe3e7a1e');
+    // socket = new WebSocket('wss://tralis-tracker-api.geops.io/ws?key=5cc87b12d7c5370001c1d655babfd9dc82ef43d99b1f12763a1ca6b4');
 
-socket.onmessage = function(e) {
-    var wsContent = JSON.parse(e.data).content;
+    socket.onopen = function(e) {
+        // Send "PING" every 10 seconds; otherwise timeout after 30 seconds
+        clearInterval(socketPingInterval);
+        socketPingInterval = setInterval(function() {
+            socket.send("PING");
+        }, 10000)
 
-    if(wsContent.length > 0) {
-        console.log(wsContent);
-        setupLine(wsContent[0]);
+        const paramTrainId = params.get("trainid");
+        if(paramTrainId != null) {
+            currentTrain = paramTrainId;
+            socket.send(`SUB stopsequence_${currentTrain}`);
+            updateLine();
+        }
+    
+        resetDisplay();
+        document.getElementById("fullScreenError").style.display = 'none';
+    }
+
+    socket.onmessage = function(e) {
+        const eventData = JSON.parse(e.data);
+        const wsContent = eventData.content;
+    
+        if(wsContent.length > 0 ) {
+            console.log(eventData);
+            if(eventData.source != `websocket`) {
+                setupLine(wsContent[0]);
+            }
+        }
+    }
+    
+    socket.onerror = function(e) {
+        alert(`[ERROER] ${e.message}`);
+        document.getElementById("fullScreenError").style.display = 'revert';
+    }
+    
+    socket.onclose = function(e) {
+        resetDisplay();
     }
 }
 
-socket.onerror = function(e) {
-    alert(`[ERROER] ${e.message}`);
-    document.getElementById("fullScreenError").style.display = 'revert';
-}
-
-socket.onclose = function(e) {
-    resetDisplay();
-}
+setupSocket();
 
 function updateLine() {
     socket.send(`GET stopsequence_${currentTrain}`);
