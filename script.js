@@ -262,7 +262,7 @@ function setupLine(data) {
             
             document.getElementById("plannedArrivalNextStop").textContent = h + ":" + m;
 
-            document.getElementById("delayNextStop").textContent = "+" + nextStopDelay;
+            document.getElementById("delayNextStop").textContent = (nextStopDelay >= 0 ? "+" : "") + nextStopDelay;
 
             break;
         }
@@ -463,8 +463,9 @@ class stationListEntry extends HTMLElement {
 
         arrowContainer.children[0].textContent = h + ":" + m; // Also needs to be hidden, but without destroying the layout
         
+        let arrivalDelay = Math.round(stationData.arrivalDelay / 60000);
         arrowContainer.children[2].style.display = (stationData.cancelled || stationData.arrivalDelay === null) ? "none" : "unset";
-        arrowContainer.children[2].textContent = "+" + Math.round(stationData.arrivalDelay / 60000);
+        arrowContainer.children[2].textContent = (arrivalDelay >= 0 ? "+" : "") + arrivalDelay;
 
         let svgData;
 
