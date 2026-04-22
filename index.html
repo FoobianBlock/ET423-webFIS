@@ -16,8 +16,9 @@
                     <div style="width: 1155px; height: 100%;">
                         <div style="height: 143px;display: flex;">
                             <div style="display: flex; width: 202px; font-family: 'myriad-pro-regular', sans-serif; font-size: 25px;">
+                                <span id="planLabel" style="position: absolute; display: none; font-size: 24px; font-family: 'myriad-pro', sans-serif; padding-top: 8px; left: 25px;">Plan</span>
                                 <span id="plannedArrivalNextStop" style="padding-left: 20px; top: 52%; position: relative; height: fit-content;"></span>
-                                <div style="position: relative; left: 8px;">
+                                <div style="position: absolute; left: 85px;">
                                     <svg id="nextStopNextStop" style="display: none;" width="40" height="143" viewBox="0 0 40 143" version="1.1" xml:space="preserve"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
                                         <g><rect
@@ -55,7 +56,7 @@
                                     <svg id="lastStopNextStop" style="display: none;" width="40" height="143" viewBox="0 0 40 143" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs id="defs2" /><g id="g320" style="display:inline"> <rect style="fill:#999999;" width="6" height="64" x="17" y="0" /> <path style="fill:#999999;" d="m 19.5,69.5 15,-15 L 31,51 19.5,62.5 Z m 0,0 -15,-15 L 8,51 19.5,62.5 Z" class="UnoptimicedTransforms" transform="translate(0.5)" /> <rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="16" x="17" y="75" /> <rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="24" x="88" y="-32" transform="rotate(90)" /> </g>
                                     </svg> 
                                 </div>
-                                <span id="delayNextStop" style="padding-left: 10px; top: 52%; position: relative; height: fit-content;"></span>
+                                <span id="delayNextStop" style="left: 126.2px; top: 74px; position: absolute; height: fit-content;"></span>
                             </div>
                             <div style="height: 100%;">
                                 <div style="width: 100%; font-size: 24px; font-family: 'myriad-pro', sans-serif; padding-top: 8px; padding-left: 2px;">
@@ -80,12 +81,12 @@
                                 <i style="color: #666666;top: 24px;position: relative;">We would like to welcome all passengers to<br><span id="welcomeTenantEN">S-Bahn München</span> and wish you a pleasant journey!</i>
                             </div>
                         </div>
-                        <div id="stationList" style="display: block; height: 276px; background-color: #E6E6E6; overflow: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        <div id="stationList" style="display: block; height: 276px; background: linear-gradient(#E6E6E6 25%, #FFF 25% 50%, #E6E6E6 50% 75%, #FFF 75%); overflow: auto; scrollbar-width: none; -ms-overflow-style: none; position: relative;" onscrollend="scrollendStationList()">
                             
                         </div>
                     </div>
-                    <div style="width: 745px; background-color: black; height: 100%;">
-                        <video id="infotainmentPlayer" autoplay muted width="100%" onended="advanceInfotainmentQueue()"></video>
+                    <div style="width: 745px; background-color: #E6E6E6; height: 100%;">
+                        <video id="infotainmentPlayer" autoplay muted width="100%" onended="advanceInfotainmentQueue()" onerror="errorInfotainmentQueue()" ondblclick="if(paused) { play() } else { pause() }"></video>
                     </div>
                 </div>
                 <div style="height: 116px; vertical-align: bottom; background-image: linear-gradient(to right, #004679, #0F86D8); display: flex; flex-direction: column;">
@@ -126,6 +127,16 @@
                                 player.setAttribute("src", infotainmentQueue[currentInfotainmentIndex]);
                             }
 
+                            function errorInfotainmentQueue() {
+                                infotainmentErrorCount++;
+                                if(infotainmentErrorCount > infotainmentQueue.length - 1) {
+                                    alert("Failed to play Infotainment!");
+                                }
+                                else {
+                                    advanceInfotainmentQueue();
+                                }
+                            }
+
                             updateClock();
                             advanceInfotainmentQueue()
                         </script>
@@ -143,10 +154,27 @@
         <div class="data-area" style="padding: 1vw; padding-top: 0;">
             <h1>Settings</h1>
             <div style="display: table;">
-                <p style="display: table-cell;">Train ID</p>
-                <div style="display: table-cell;display: flex;">
-                    <input type="text" id="input_dbgTrainID">
-                    <input type="submit" value="Submit" onclick="debugSearchTrainID()">
+                <div style="display: table-row;">
+                    <p style="display: table-cell;">Train ID</p>
+                    <div style="display: table-cell;display: flex;">
+                        <input type="text" id="input_dbgTrainID">
+                        <input type="submit" value="Submit" onclick="debugSearchTrainID()">
+                    </div>
+                </div>
+                
+                <div style="display: table-row;">
+                    <p style="display: table-cell;">Software</p>
+                    <div style="display: table-cell;display: flex;">
+                        <select id="input_software" onchange="softwareVersion = value;">
+                            <optgroup label="S-Bahn München">
+                                <option value="sbm_423_2021">S-Bahn München - BR 423 (2021)</option>
+                                <option value="sbm_423_2024" disabled>S-Bahn München - BR 423 (2024)</option>
+                                <option value="sbm_423_2026" disabled>S-Bahn München - BR 423 (2026)</option>
+                                <option value="sbm_423_offline">S-Bahn München - BR 423 (Offline)</option>
+                                <option value="sbm_424_offline">S-Bahn München - BR 424</option>
+                            </optgroup>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

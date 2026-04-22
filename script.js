@@ -5,10 +5,14 @@ let socketPingInterval = -1;
 
 let leftPanelViewIndex = 0;
 let currentInfotainmentIndex = 0;
-const infotainmentQueue = Object.seal(["https://assets.static-bahn.de/dam/jcr:aaf020f0-40d8-4d2b-ac31-12890def7ba8/BEG-23-1046_Neue_Fahrkartenautomaten_1920x1080_Sound%20(1).mp4","https://assets.static-bahn.de/dam/jcr:5e33cbde-1254-4241-a8d4-2f6dcb605d47/220202_1080p_Erklaervideo_Simpleshow_Folienballons.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4","https://assets.static-bahn.de/dam/jcr:da1188f1-8293-4351-8ac7-f26d1dbb4b5c/220202_1080p_Erklaervideo_Simpleshow_PersonenImGleis.mp4","https://assets.static-bahn.de/dam/jcr:a0c7be5c-39a1-4cac-8593-26ef12b8dea9/220202_1080p_Erklaervideo_Simpleshow_Tuerstoerung.mp4","https://assets.static-bahn.de/dam/jcr:49af3eb3-ff25-4de5-97a8-3f8ce9aa4f3a/220202_1080p_Erklaervideo_Simpleshow_Bahn%C3%BCberg%C3%A4nge_Clip01.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4"]);
+let infotainmentErrorCount = 0;
+// const infotainmentQueue = Object.seal(["https://assets.static-bahn.de/dam/jcr:aaf020f0-40d8-4d2b-ac31-12890def7ba8/BEG-23-1046_Neue_Fahrkartenautomaten_1920x1080_Sound%20(1).mp4","https://assets.static-bahn.de/dam/jcr:5e33cbde-1254-4241-a8d4-2f6dcb605d47/220202_1080p_Erklaervideo_Simpleshow_Folienballons.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4","https://assets.static-bahn.de/dam/jcr:da1188f1-8293-4351-8ac7-f26d1dbb4b5c/220202_1080p_Erklaervideo_Simpleshow_PersonenImGleis.mp4","https://assets.static-bahn.de/dam/jcr:a0c7be5c-39a1-4cac-8593-26ef12b8dea9/220202_1080p_Erklaervideo_Simpleshow_Tuerstoerung.mp4","https://assets.static-bahn.de/dam/jcr:49af3eb3-ff25-4de5-97a8-3f8ce9aa4f3a/220202_1080p_Erklaervideo_Simpleshow_Bahn%C3%BCberg%C3%A4nge_Clip01.mp4","https://assets.static-bahn.de/dam/jcr:6b82b65c-3cd4-4915-b02c-8fa5abde431e/220202_1080p_Erklaervideo_Simpleshow_SauberkeitImZug.mp4"]);
+const infotainmentQueue = Object.seal(["https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/250311_1920x1080p_Erklaervideo_Stoerfallkarten.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/Lightgate.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/folienballons.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/sprechstelle.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/Notbremse.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/bahnuebergang-zu-fuss.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/Gegenstaende-im-Gleis.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/tuerstoerung.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/sauberkeit-im-zug.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/mehrzweckbereich.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/Unbeaufsichtigte-Gepaeckstuecke.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/personen-im-gleis.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/Gepaeckablage.mp4","https://cms.static-bahn.de/wmedia/redaktion/videos/s-bahn-muenchen/erklaervideos-s-bahn-fahren/fahrradmitnahme.mp4"]);
 
 let activeDepartureTimerInterval;
 let activeFirstStopViewInterval = null;
+
+let softwareVersion = "sbm_423_2021";
 
 let currentTrain;
 const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Petershausen(Obb)":{"nameDE":"Petershausen","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
@@ -22,7 +26,7 @@ function setupSocket() {
         socket.close();
     }
 
-    socket = new WebSocket('wss://api.geops.io/realtime-ws/stag/?key=5cc87b12d7c5370001c1d655112ec5c21e0f441792cfc2fafe3e7a1e');
+    socket = new WebSocket('wss://api.geops.io/realtime-ws/v1/?key=5cc87b12d7c5370001c1d655112ec5c21e0f441792cfc2fafe3e7a1e');
     // socket = new WebSocket('wss://tralis-tracker-api.geops.io/ws?key=5cc87b12d7c5370001c1d655babfd9dc82ef43d99b1f12763a1ca6b4');
 
     socket.onopen = function(e) {
@@ -93,10 +97,14 @@ function resetDisplay() {
 }
 
 function setupLine(data) {
+    const isOffline = softwareVersion.endsWith("offline");
+    const isGSP = softwareVersion === "sbm_424_offline";
+
     document.getElementById("finalDestinationDE").innerText = getStationNameDE(data.destination);
-    document.getElementById("finalDestinationEN").innerText = getStationNameEN(data.destination);
-    document.getElementById("finalDestinationRVFV").style.display = getStationRVFV(data.destination) ? "revert" : "none";
-    document.getElementById("welcomeLineNumber").textContent = data.longName;
+    document.getElementById("finalDestinationEN").innerText = isOffline ? "" : getStationNameEN(data.destination);
+    document.getElementById("finalDestinationRVFV").style.display = (!isOffline && getStationRVFV(data.destination)) ? "revert" : "none";
+    document.getElementById("welcomeLineNumber").textContent = data.longName + (isOffline ? "!" : "");
+    document.getElementById("planLabel").style.display = (isOffline && !isGSP) ? "revert" : "none";
 
     const tenantDE = document.getElementById("welcomeTenantDE");
     const tenantEN = document.getElementById("welcomeTenantEN");
@@ -171,9 +179,9 @@ function setupLine(data) {
             nextStationIndex = i;
 
             document.getElementById("nextStopDE").innerText = getStationNameDE(element.stationName);
-            document.getElementById("nextStopRVFV").style.display = getStationRVFV(element.stationName) ? "revert" : "none";
+            document.getElementById("nextStopRVFV").style.display = (!isOffline && getStationRVFV(element.stationName)) ? "revert" : "none";
 
-            if(getStationNameEN(element.stationName) != null) {
+            if(!isOffline && getStationNameEN(element.stationName) != null) {
                 document.getElementById("nextStopEN").innerText = getStationNameEN(element.stationName);
                 document.getElementById("nextStopEN").style.display = "revert";
             }
@@ -186,15 +194,23 @@ function setupLine(data) {
 
             clearInterval(activeDepartureTimerInterval);
             
-            if(element.state == "BOARDING") {    
+            if((element.state == "BOARDING" || element.state == "TIME_BASED") && !isGSP) {    
                 // First Station
                 if(i === 0) {
+                    console.log(element.stationName);
                     document.getElementById("firstStopNextStop").style.display = "block";
                     document.getElementById("nextStopNextStop").style.display = "none";
                     document.getElementById("lastStopNextStop").style.display = "none";
 
-                    updateDepartureTime();
-                    activeDepartureTimerInterval = setInterval(updateDepartureTime, 15000);
+                    if(isOffline) {
+                        document.getElementById("stationActionDE").innerText = isOffline ? "Abfahrt / Departure" : "Abfahrt";
+                        document.getElementById("stationActionEN").innerText = isOffline ? "" : "Departure";
+                        document.getElementById("stationActionDepartureTime").innerText = "";
+                    }
+                    else {
+                        updateDepartureTime();
+                        activeDepartureTimerInterval = setInterval(updateDepartureTime, 15000);
+                    }
 
                     if(activeFirstStopViewInterval === null) {
                         activeFirstStopViewInterval = setInterval(
@@ -222,19 +238,19 @@ function setupLine(data) {
                         document.getElementById("lastStopNextStop").style.display = "none";
                     }
 
-                    document.getElementById("stationActionDE").innerText = "Abfahrt";
-                    document.getElementById("stationActionEN").innerText = "Departure";
+                    document.getElementById("stationActionDE").innerText = isOffline ? "Abfahrt / Departure" : "Abfahrt";
+                    document.getElementById("stationActionEN").innerText = isOffline ? "" : "Departure";
                     document.getElementById("stationActionDepartureTime").innerText = "";
                 }
 
                 nextStopTime = new Date(element.aimedDepartureTime);
                 nextStopDelay = Math.round(element.departureDelay / 60000);
-                document.getElementById("delayNextStop").style.display = (element.cancelled || element.departureDelay === null) ? "none" : "unset";
+                document.getElementById("delayNextStop").style.display = (isOffline || element.cancelled || element.departureDelay === null) ? "none" : "unset";
             }
             else {
                 clearFirstStopViewInterval();
                 
-                if(i === stations.length - 1) {
+                if(!isGSP && i === stations.length - 1) {
                     document.getElementById("firstStopNextStop").style.display = "none";
                     document.getElementById("nextStopNextStop").style.display = "none";
                     document.getElementById("lastStopNextStop").style.display = "block";
@@ -245,13 +261,13 @@ function setupLine(data) {
                     document.getElementById("lastStopNextStop").style.display = "none";
                 }
 
-                document.getElementById("stationActionDE").innerText = "Nächster Halt";
-                document.getElementById("stationActionEN").innerText = "Next stop";
+                document.getElementById("stationActionDE").innerText = isOffline ? "Nächster Halt / Next stop" : "Nächster Halt";
+                document.getElementById("stationActionEN").innerText = isOffline ? "" : "Next stop";
                 document.getElementById("stationActionDepartureTime").innerText = "";
 
                 nextStopTime = new Date(element.aimedArrivalTime);
                 nextStopDelay = Math.round(element.arrivalDelay / 60000);
-                document.getElementById("delayNextStop").style.display = (element.cancelled || element.arrivalDelay === null) ? "none" : "unset";
+                document.getElementById("delayNextStop").style.display = (isOffline || element.cancelled || element.arrivalDelay === null) ? "none" : "unset";
             }
 
             let h = nextStopTime.getHours();
@@ -261,6 +277,7 @@ function setupLine(data) {
             if(m < 10) {m = "0" + m};
             
             document.getElementById("plannedArrivalNextStop").textContent = h + ":" + m;
+            document.getElementById("plannedArrivalNextStop").style.display = isGSP ? "none" : "unset";
 
             document.getElementById("delayNextStop").textContent = (nextStopDelay >= 0 ? "+" : "") + nextStopDelay;
 
@@ -269,20 +286,41 @@ function setupLine(data) {
     }
 
     const stationListElement = document.getElementById("stationList");
-    if(stationListElement.childElementCount != stations.length) {
+    if(stationListElement.childElementCount != (isGSP ? 4 : stations.length)) {
         stationListElement.innerHTML = '';
     }
     
-    for (let i = 0; i < stations.length; i++) {    
-        if(i >= stationListElement.childElementCount) {
-            stationListElement.appendChild(newStationListEntry(stations[i], i));
+    if(!isGSP)
+    {
+        for (let i = 0; i < stations.length; i++) {    
+            if(i >= stationListElement.childElementCount) {
+                stationListElement.appendChild(newStationListEntry(stations[i], i, isOffline));
+            }
+    
+            const element = stationListElement.children[i];
+            element.updateEntry(stations[i], i, isOffline);
+            element.style.display = i > nextStationIndex ? 'block' : 'none';
+        }
+    }
+    else
+    {
+        const stationData424 = {
+            stationName: "",
+            aimedArrivalTime: -1,
+            arrivalDelay: -1,
+            cancelled: false,
+            noDropOff: false,
+            noPickUp:  false,
         }
 
-        const element = stationListElement.children[i];
-        element.updateEntry(stations[i], i);
-        element.style.backgroundColor = ((nextStationIndex - i) % 2 === 0) ? '#FFFFFF' : '#E6E6E6';
-        
-        element.style.display = i > nextStationIndex ? 'block' : 'none';
+        for (let i = 0; i < 4; i++) {
+            if(i >= stationListElement.childElementCount) {
+                stationListElement.appendChild(newStationListEntry(stationData424, i, true));
+            }
+
+            const element = stationListElement.children[i];
+            element.updateEntry(stationData424, i, true);
+        }
     }
 }
 
@@ -337,9 +375,9 @@ function clearFirstStopViewInterval() {
     }
 }
 
-function newStationListEntry(stationData, i) {
+function newStationListEntry(stationData, i, isOffline) {
     let element = document.createElement("station-list-entry");
-    element.updateEntry(stationData, i);
+    element.updateEntry(stationData, i, isOffline);
     return element;
 }
 
@@ -389,6 +427,15 @@ function debugSearchTrainID() {
     updateLine();
 }
 
+function scrollendStationList() {
+    const e = document.getElementById("stationList");
+    e.scrollTo({
+        top: Math.round(e.scrollTop / 69) * 69,
+        left: 0,
+        behavior: "smooth",
+    });
+}
+
 //#region Station List Entry Elememt
 // Define the custom element
 class stationListEntry extends HTMLElement {
@@ -414,10 +461,12 @@ class stationListEntry extends HTMLElement {
         const plannedArrivalTime = document.createElement('span');
         plannedArrivalTime.style.paddingLeft = '20px';
         const svgContainer = document.createElement('div');
-        svgContainer.style.position = 'relative';
-        svgContainer.style.left = '8px';
+        svgContainer.style.position = 'absolute';
+        svgContainer.style.left = '85px';
         const delay = document.createElement('span');
-        delay.style.paddingLeft = '10px';
+        delay.className = 'delay';
+        delay.style.position = 'absolute';
+        delay.style.left = '126.2px';
 
         const nameDE = document.createElement('span');
         nameDE.style.paddingRight = '5px';
@@ -449,7 +498,7 @@ class stationListEntry extends HTMLElement {
     }
 
     // Update the content based on the data object
-    updateEntry(stationData, i) {
+    updateEntry(stationData, i, isOffline) {
         const container = this.shadowRoot.querySelector('div');
         const arrowContainer = container.children[0];
         const nameContainer = container.children[1];
@@ -461,17 +510,18 @@ class stationListEntry extends HTMLElement {
         if(h < 10) {h = "0" + h};
         if(m < 10) {m = "0" + m};
 
-        arrowContainer.children[0].textContent = h + ":" + m; // Also needs to be hidden, but without destroying the layout
+        arrowContainer.children[0].textContent = h + ":" + m;
+        arrowContainer.children[0].style.display = (stationData.cancelled || stationData.aimedArrivalTime < 0) ? "none" : "unset";
         
         let arrivalDelay = Math.round(stationData.arrivalDelay / 60000);
-        arrowContainer.children[2].style.display = (stationData.cancelled || stationData.arrivalDelay === null) ? "none" : "unset";
+        arrowContainer.children[2].style.display = (isOffline || stationData.cancelled || stationData.arrivalDelay === null) ? "none" : "unset";
         arrowContainer.children[2].textContent = (arrivalDelay >= 0 ? "+" : "") + arrivalDelay;
 
         let svgData;
 
         if(i === (lineData.stations.length - 1)) { // Last stop
             if(stationData.cancelled) {
-                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#666666"><rect style="fill:#666666;" width="6" height="34" x="17" y="0" /><rect style="fill:#666666;" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;fill:#999999"><rect style="fill:#999999;" width="6" height="34" x="17" y="0" /><rect style="fill:#999999;" width="6" height="24" x="34" y="-32" transform="rotate(90)" /></g></svg>';
                 canceledStopEntires.push(container);
             }
             else {
@@ -481,7 +531,7 @@ class stationListEntry extends HTMLElement {
         }
         else {
             if(stationData.cancelled) { // Canceled stop
-                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+                svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect style="display:inline;fill:#999999;" width="6" height="69" x="17" y="0" /></g></svg>';
                 // Add aditional check if any stop afterwards is not canceled (even though I have no idea how that would be displayed)
                 canceledStopEntires.push(container);
             }
@@ -504,12 +554,12 @@ class stationListEntry extends HTMLElement {
                 }
                 
                 if(finalBeforeCancelled) { // Normal stop with only cancelled stops afterwards (Early terminus)
-                    svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" id="svg138" sodipodi:docname="line_finalStop.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <rect style="fill:#ffffff;stroke-width:1.04319" class="lineStrokeColoured" width="6" height="37" x="17" y="0"/> <rect style="fill:#ffffff" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)"/> <rect style="fill:#666666;" width="6" height="25" x="17" y="44"/></g></svg>';
+                    svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" id="svg138" sodipodi:docname="line_finalStop.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <rect style="fill:#ffffff;stroke-width:1.04319" class="lineStrokeColoured" width="6" height="37" x="17" y="0"/> <rect style="fill:#ffffff" class="lineStrokeColoured" width="6" height="24" x="34" y="-32" transform="rotate(90)"/> <rect style="fill:#999999;" width="6" height="25" x="17" y="44"/></g></svg>';
                 }
                 else {
                     tintCanceledStops();
                     if(stationData.noDropOff && stationData.noPickUp) { // Passing station
-                        svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+                        svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#999999;" width="6" height="69" x="17" y="0" /></g></svg>';
                     }
                     else { // Normal stop
                         svgData = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><defs><clipPath clipPathUnits="userSpaceOnUse" id="clipPath3870"><circle style="display:none;" id="circle2860" cx="20" cy="35" r="5" d="m 25,35 a 5,5 0 0 1 -5,5 5,5 0 0 1 -5,-5 5,5 0 0 1 5,-5 5,5 0 0 1 5,5 z" /><path id="lpe_path-effect2862" style="display:inline;" class="powerclip" d="M 4,19 H 36 V 51 H 4 Z m 21,16 a 5,5 0 0 0 -5,-5 5,5 0 0 0 -5,5 5,5 0 0 0 5,5 5,5 0 0 0 5,-5 z" /></clipPath></defs><g style="fill:#ffffff"><rect style="display:inline;fill:#ffffff;stroke:none;" class="lineStrokeColoured" width="6" height="25" x="17" y="44" id="rect7" /><path style="fill:#ffffff" clip-path="url(#clipPath3870)" class="lineStrokeColoured" d="M 31,35 A 11,11 0 0 1 20,46 11,11 0 0 1 9,35 11,11 0 0 1 20,24 11,11 0 0 1 31,35 Z" id="path9" transform="translate(0,1)" /><rect style="fill:#ffffff;" class="lineStrokeColoured" width="6" height="27" x="17" y="0"/></g></svg>';
@@ -531,7 +581,7 @@ class stationListEntry extends HTMLElement {
         nameContainer.children[0].textContent = getStationNameDE(stationData.stationName);
 
         const stationNameEN = getStationNameEN(stationData.stationName);
-        if(stationNameEN != null) {            
+        if(!isOffline && stationNameEN != null) {            
             nameContainer.children[1].textContent = stationNameEN;
             nameContainer.children[1].style.display = 'revert';
         }
@@ -539,14 +589,14 @@ class stationListEntry extends HTMLElement {
             nameContainer.children[1].style.display = 'none';
         }
 
-        nameContainer.children[2].style.display = getStationRVFV(stationData.stationName) ? 'revert' : 'none';
+        nameContainer.children[2].style.display = (!isOffline && getStationRVFV(stationData.stationName)) ? 'revert' : 'none';
     }
 }
 
 function tintCanceledStops() {
     canceledStopEntires.forEach(element => {
         console.log("c");
-        element.children[0].children[1].innerHTML = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#666666;" width="6" height="69" x="17" y="0" /></g></svg>';
+        element.children[0].children[1].innerHTML = '<svg width="40" height="69" viewBox="0 0 40 69" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g style="display:inline;"><rect class="lineStrokeColoured" style="display:inline;fill:#999999;" width="6" height="69" x="17" y="0" /></g></svg>';
         
         const lineStrokeColouredElements = element.getElementsByClassName("lineStrokeColoured")
         const strokeCol = (lineData.stroke === null) ? '#008E4E' : lineData.stroke;
