@@ -86,7 +86,7 @@
                         </div>
                     </div>
                     <div style="width: 745px; background-color: #E6E6E6; height: 100%;">
-                        <video id="infotainmentPlayer" autoplay muted width="100%" onended="advanceInfotainmentQueue()" onerror="errorInfotainmentQueue()" ondblclick="if(paused) { play() } else { pause() }"></video>
+                        <video id="infotainmentPlayer" autoplay muted width="100%" onended="advanceInfotainmentQueue()" onerror="errorInfotainmentQueue()" onclick="if(paused) { play() } else { pause() }"></video>
                     </div>
                 </div>
                 <div style="height: 116px; vertical-align: bottom; background-image: linear-gradient(to right, #004679, #0F86D8); display: flex; flex-direction: column;">
@@ -165,13 +165,19 @@
                 <div style="display: table-row;">
                     <p style="display: table-cell;">Software</p>
                     <div style="display: table-cell;display: flex;">
-                        <select id="input_software" onchange="softwareVersion = value;">
+                        <select id="input_software" onchange="softwareVersion = value; updateLine();">
                             <optgroup label="S-Bahn München">
                                 <option value="sbm_423_2021">S-Bahn München - BR 423 (2021)</option>
                                 <option value="sbm_423_2024" disabled>S-Bahn München - BR 423 (2024)</option>
                                 <option value="sbm_423_2026" disabled>S-Bahn München - BR 423 (2026)</option>
                                 <option value="sbm_423_offline">S-Bahn München - BR 423 (Offline)</option>
                                 <option value="sbm_424_offline">S-Bahn München - BR 424</option>
+                            </optgroup>
+                            <optgroup label="S-Bahn Köln">
+                                <option value="sbk_424_offline" disabled>S-Bahn Köln - BR 424</option>
+                            </optgroup>
+                            <optgroup label="S-Bahn Stuttgart">
+                                <option value="sbs_430" disabled>S-Bahn Stuttgart - BR 430</option>
                             </optgroup>
                         </select>
                     </div>

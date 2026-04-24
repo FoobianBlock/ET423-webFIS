@@ -15,7 +15,7 @@ let activeFirstStopViewInterval = null;
 let softwareVersion = "sbm_423_2021";
 
 let currentTrain;
-const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hauptbahnof Nord","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Petershausen(Obb)":{"nameDE":"Petershausen","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
+const stationDataJson = '{"Hamburg Hbf (S-Bahn)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Hamburg-Altona(S)":{"rvfv":true},"Hamburg Dammtor":{"rvfv":true},"Hamburg-Eidelstedt":{"rvfv":true},"Hamburg-Harburg(S)":{"rvfv":true},"Hamburg-Holstenstraße":{"rvfv":true},"Hamburg-Bergdorf":{"rvfv":true},"Hauptbahnhof (S, U, Bus, Tram)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"München Hbf Gl.27-36":{"nameDE":"Hbf Gl. 27-36","rvfv":true},"München Ost":{"nameDE":"Ostbahnhof","nameEN":"Munich East","rvfv":true},"Flughafen/Airport ✈":{"nameDE":"Flughafen München","nameEN":"Airport"},"München Karlsplatz":{"nameDE":"Karlsplatz (Stachus)"},"München Hbf (tief)":{"nameDE":"Hauptbahnhof","nameEN":"Central Station","rvfv":true},"Petershausen(Obb)":{"nameDE":"Petershausen","rvfv":true},"München St.Martin-Str.":{"nameDE":"St.-Martin-Straße"},"Furth(b Deisenhofen)":{"nameDE":"Furth"},"München-Pasing":{"rvfv":true},"München Donnersbergerbrücke":{"rvfv":true},"Dachau Bahnhof":{"rvfv":true},"Deisenhofen":{"rvfv":true},"Markt Schwaben":{"rvfv":true},"München Heimeranplatz":{"rvfv":true},"München Harras":{"rvfv":true},"München-Mittersendling":{"rvfv":true},"München Siemenswerke":{"rvfv":true},"München-Solln":{"rvfv":true},"Kreuzstraße":{"rvfv":true},"Mammendorf":{"rvfv":true},"Holzkirchen":{"rvfv":true},"Starnberg":{"rvfv":true},"Tutzing":{"rvfv":true},"Grafing Stadt":{"rvfv":true},"Grafing Bahnhof":{"rvfv":true},"Ebersberg(Oberbay)":{"rvfv":true},"München-Feldmoching":{"rvfv":true},"München-Moosach":{"rvfv":true},"Geltendorf":{"rvfv":true}}';
 let stationData = JSON.parse(stationDataJson);
 let nextStationIndex = 0;
 let canceledStopEntires = [];
@@ -52,8 +52,8 @@ function setupSocket() {
         const wsContent = eventData.content;
     
         if(wsContent.length > 0 ) {
-            console.log(eventData);
             if(eventData.source != `websocket`) {
+                console.log(eventData);
                 setupLine(wsContent[0]);
             }
         }
@@ -72,7 +72,9 @@ function setupSocket() {
 setupSocket();
 
 function updateLine() {
-    socket.send(`GET stopsequence_${currentTrain}`);
+    if (currentTrain != null) {
+        socket.send(`GET stopsequence_${currentTrain}`);
+    }
 }
 
 function resetDisplay() {
@@ -175,7 +177,11 @@ function setupLine(data) {
     for (let i = 0; i < stations.length; i++) {
         const element = stations[i];
         
-        if(element.state != "LEAVING" && element.state != "JOURNEY_CANCELLED" && element.state != "STOP_CANCELLED") { // Conditions for something to be considered a "Next stop"
+        if(element.state != "LEAVING" 
+           && element.state != "JOURNEY_CANCELLED" 
+           && element.state != "STOP_CANCELLED" 
+           && !(element.state == "TIME_BASED" && new Date(element.departureTime) < new Date())
+          ) { // Conditions for something to be considered a "Next stop"
             nextStationIndex = i;
 
             document.getElementById("nextStopDE").innerText = getStationNameDE(element.stationName);
